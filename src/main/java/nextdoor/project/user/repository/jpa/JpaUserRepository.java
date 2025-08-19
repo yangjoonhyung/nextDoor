@@ -31,4 +31,9 @@ public class JpaUserRepository implements UserRepository {
     public void delete(String userId) {
 
     }
+
+    @Override
+    public User findByEmailAndName(String email, String name) {
+        return null;
+    }
 }
