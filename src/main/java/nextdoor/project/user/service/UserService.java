@@ -32,4 +32,9 @@ public class UserService {
     public void delete(String userId) {
         userRepository.delete(userId);
     }
+
+    public User findByEmailAndName(String email, String name) {
+        return userRepository.findByEmailAndName(email, name);
+    }
+
 }
