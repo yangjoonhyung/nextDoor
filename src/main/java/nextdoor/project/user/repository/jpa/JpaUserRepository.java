@@ -12,8 +12,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JpaUserRepository implements UserRepository {
 
-    private final EntityManager em;
-
     @Override
     public User save(User user) {
         em.persist(user);
@@ -54,5 +52,6 @@ public class JpaUserRepository implements UserRepository {
                 .getSingleResult();
 
         return result;
+
     }
 }
