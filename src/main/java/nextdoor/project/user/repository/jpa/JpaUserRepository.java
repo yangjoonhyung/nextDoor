@@ -1,7 +1,7 @@
 package nextdoor.project.user.repository.jpa;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 import nextdoor.project.user.User;
 import nextdoor.project.user.repository.UserRepository;
 import org.springframework.stereotype.Repository;
@@ -9,10 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class JpaUserRepository implements UserRepository {
-
-    @PersistenceContext
-    private EntityManager em;
 
     @Override
     public User save(User user) {
@@ -22,36 +20,38 @@ public class JpaUserRepository implements UserRepository {
 
     @Override
     public User findById(String userId) {
-        return em.find(User.class, userId);
+        User user = em.find(User.class, userId);
+        return user;
     }
 
     @Override
     public List<User> findAll() {
-        return em.createQuery("select u from User u", User.class).getResultList();
+        String jpql = "select u from User u";
+        List resultList = em.createQuery(jpql).getResultList();
+        return resultList;
     }
 
     @Override
     public void changePassword(String userId, String changePw) {
         User user = em.find(User.class, userId);
-        if (user != null) {
-            user.setPassword(changePw);
-        }
+        user.setPassword(changePw);
     }
 
     @Override
     public void delete(String userId) {
         User user = em.find(User.class, userId);
-        if (user != null) {
-            em.remove(user);
-        }
+        em.remove(user);
     }
 
     @Override
     public User findByEmailAndName(String email, String name) {
-        List<User> list = em.createQuery("select u from User u where u.email = :email and u.name = :name", User.class)
+        String jpql = "select u form User u where u.email = :email and u.name = :name";
+        User result = em.createQuery(jpql, User.class)
                 .setParameter("email", email)
                 .setParameter("name", name)
-                .getResultList();
-        return list.isEmpty() ? null : list.get(0);
+                .getSingleResult();
+
+        return result;
+
     }
 }
