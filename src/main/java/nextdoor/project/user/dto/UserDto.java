@@ -14,7 +14,6 @@ public class UserDto {
     private String userId;
 
     @NotBlank(message = "비밀번호를 입력해주세요.")
-    @Size(min = 6, message = "비밀번호는 최소 6자 이상이어야 합니다.")
     private String password;
 
     @NotBlank(message = "비밀번호 확인을 입력해주세요.")
