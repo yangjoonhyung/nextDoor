@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import nextdoor.project.user.User;
+import nextdoor.project.user.dto.UserIdFindDto;
 import nextdoor.project.user.dto.UserDto;
 import nextdoor.project.user.service.UserService;
 import org.springframework.stereotype.Controller;
@@ -81,6 +82,31 @@ public class UserController {
     @GetMapping("/find")
     public User findByEmailAndName(@RequestParam String email, @RequestParam String name) {
         return userService.findByEmailAndName(email, name);
+    }
+
+    // 아이디 찾기 폼
+    @GetMapping("/findId")
+    public String findIdForm(Model model) {
+        model.addAttribute("userIdFindDto", new UserIdFindDto());
+        return "user/findIdForm";
+    }
+
+    // 아이디 찾기
+    @PostMapping("/findId")
+    public String findId(@Valid @ModelAttribute UserIdFindDto userIdFindDto, BindingResult bindingResult, Model model) {
+        User result = userService.findByEmailAndName(userIdFindDto.getEmail(), userIdFindDto.getName());
+
+        if (bindingResult.hasErrors()) {
+            return "user/findIdForm";
+        }
+
+        if (result == null) {
+            bindingResult.reject("idFindCheck", "일치하는 회원이 없습니다.");
+            return "user/findIdForm";
+        }
+
+        model.addAttribute("findId", result.getUserId());
+        return "user/findIdForm";
     }
 
     //비밀번호 변경
