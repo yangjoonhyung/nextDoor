@@ -6,8 +6,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface CartRepository extends JpaRepository<Cart, Long> {
+public interface CartRepository {
 
+    Cart save(Cart cart);
     List<Cart> findByUser(User user);
     void deleteByUserAndPlaceId(User user, String placeId);
 }
