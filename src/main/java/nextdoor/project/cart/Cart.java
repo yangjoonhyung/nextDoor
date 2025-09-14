@@ -10,8 +10,9 @@ import java.time.LocalDateTime;
 @Getter @Setter
 public class Cart {
 
-    @Id
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; //아이템 id
+    @OneToOne
     private User user;
     private String placeId;     // api 받아오는 id
     private String placeName;   // 장소 이름
