@@ -12,7 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,7 +29,7 @@ public class UserController {
         List<User> users = userService.findAll();
         model.addAttribute("users", users);
 
-        model.addAttribute("loginUserId", session.getAttribute("loginUserId"));
+        model.addAttribute("userId", session.getAttribute("userId"));
         return "user/list";
     }
 
@@ -51,6 +53,11 @@ public class UserController {
             bindingResult.rejectValue("checkPassword", "passwordNotMatch", "비밀번호가 일치하지 않습니다.");
         }
 
+        // 아이디 중복 검증
+        if (userService.isSameId(userDto.getUserId())) {
+            bindingResult.rejectValue("userId", "isSameId", "이미 사용중인 아이디입니다.");
+        }
+
         if (bindingResult.hasErrors()) {
             // 에러 있을 때 다시 폼으로
             return "user/join";
@@ -65,9 +72,22 @@ public class UserController {
         );
         userService.save(user);
 
-        session.setAttribute("loginUserId", user.getUserId());
+        session.setAttribute("userId", user.getUserId());
 
         return "redirect:/users";
+    }
+
+    // 아이디 중복 AJAX
+    @GetMapping("/check-duplicate-id")
+    @ResponseBody
+    public Map<String, String> checkSameId(@RequestParam String userId) {
+        Map<String, String> response = new HashMap<>();
+        if (userService.isSameId(userId)) {
+            response.put("errorMessage", "이미 사용중인 아이디입니다.");
+        } else {
+            response.put("successMessage", "사용 가능한 아이디입니다.");
+        }
+        return response;
     }
 
     // 회원 조회
