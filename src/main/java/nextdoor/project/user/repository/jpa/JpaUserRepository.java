@@ -47,7 +47,7 @@ public class JpaUserRepository implements UserRepository {
 
     @Override
     public User findByEmailAndName(String email, String name) {
-        String jpql = "select u form User u where u.email = :email and u.name = :name";
+        String jpql = "select u from User u where u.email = :email and u.name = :name";
         User result = em.createQuery(jpql, User.class)
                 .setParameter("email", email)
                 .setParameter("name", name)
