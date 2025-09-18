@@ -37,6 +37,7 @@ public class CartController {
         }
 
         // 담을 수 있는 관광지 리스트 표기 - 프론트에서 받아오기
+        // 지희한테 버튼 만들어달라해서 밑에 한줄 따로 @postMapping 빼기 이거 할 때 준형이한테 말하기
         List<Area> areaList = callApi.callApi("서울", "관광지");
         model.addAttribute("areaList", areaList);
         return "cart/list";
@@ -63,6 +64,7 @@ public class CartController {
     public String setPlan(HttpSession session) {
         String userId = (String) session.getAttribute("userId");
         User findUser = userRepository.findById(userId);
+        // 시작 연 원 일 도착 연 월 일 지희한테 받아서 여기 입력할 수 있게하기
         TripPlan tripPlan = new TripPlan(findUser, 1, 1, 1, 1, 1, 1);
 
         List<Cart> carts = cartService.getCart(userId);
