@@ -82,5 +82,21 @@ public class CartController {
         return "받아온 페이지로 리다이렉트 시키기";
     }
 
+    @GetMapping("/get-plan/{tripPlanId}")
+    public String getPlan(@PathVariable String tripPlanId, HttpSession session) {
+        String userId = (String) session.getAttribute("userId");
+
+        // 현성이한테 받아서 사용하기
+        // 리스트 생성
+        return "보여주는 페이지";
+    }
+
+    @PostMapping("/get-plan/{tripPlanId}")
+    public String goToMyPage(HttpSession session) {
+        String userId = (String) session.getAttribute("userId");
+
+        return "redirect:/my-page/plan";
+    }
+
     // ai 서버로 보내기
 }

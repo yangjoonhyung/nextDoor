@@ -22,6 +22,7 @@ public class TripPlan {
 
     private LocalDate startDate;
     private LocalDate finishDate;
+    private String title;
 
     public TripPlan() {
     }
@@ -30,5 +31,6 @@ public class TripPlan {
         this.user = user;
         this.startDate = LocalDate.of(startYear, startMonth, startDay);
         this.finishDate = LocalDate.of(finishYear, finishMonth, finishDay);
+        this.title = startYear + "년 " + startMonth + "월 " + startDay + "일 여행";
     }
 }
