@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import nextdoor.project.cart.Cart;
 import nextdoor.project.cart.repository.CartRepository;
+import nextdoor.project.tripplan.TripPlan;
 import nextdoor.project.user.User;
 import org.springframework.stereotype.Repository;
 
@@ -33,6 +34,16 @@ public class JpaCartRepository implements CartRepository {
 
     @Override
     public void deleteByUserAndPlaceId(User user, String placeId) {
-        
+
+    }
+
+    @Override
+    public List<Cart> findByTripPlanId(TripPlan tripPlan) {
+        String jpql = "select cart from cart c where c.tripPlan.tripPlanId = :tripPlanId";
+        List<Cart> resultList = em.createQuery(jpql, Cart.class)
+                .setParameter("tripPlanId", tripPlan.getTripPlanID())
+                .getResultList();
+
+        return resultList;
     }
 }

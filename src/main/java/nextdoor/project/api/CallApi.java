@@ -33,7 +33,8 @@ public class CallApi {
             "광주", 5,
             "부산", 6,
             "경기도", 31,
-            "강원도", 32
+            "강원도", 32,
+            "제주도", 39
     );
 
     private static final Map<String, Integer> mappingContentTypeCode = Map.of(

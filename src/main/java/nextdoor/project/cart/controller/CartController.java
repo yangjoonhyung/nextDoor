@@ -2,13 +2,20 @@ package nextdoor.project.cart.controller;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import nextdoor.project.api.Area;
+import nextdoor.project.api.CallApi;
+import nextdoor.project.cart.Cart;
+import nextdoor.project.cart.repository.CartRepository;
 import nextdoor.project.cart.service.CartService;
+import nextdoor.project.tripplan.TripPlan;
+import nextdoor.project.user.User;
+import nextdoor.project.user.repository.UserRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -16,27 +23,64 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class CartController {
 
     private final CartService cartService;
-
-    public String addCart(@RequestParam String placeId, @RequestParam String placeName, HttpSession session){
-        String userId = (String) session.getAttribute("userId");
-
-        cartService.addCart(userId, placeId, placeName);
-        return "redirect:/cart/list";
-    }
+    private final CallApi callApi;
+    private final UserRepository userRepository;
+    private final CartRepository cartRepository;
 
     // 장바구니 목록
     @GetMapping("/list")
     public String cartList(HttpSession session, Model model) {
-        String userId = (String) session.getAttribute("loginUserId");
-        model.addAttribute("cartItems", cartService.getCart(userId));
+        String userId = (String) session.getAttribute("userId");
+        List<Cart> cart = cartService.getCart(userId);
+        if (cart != null) {
+            model.addAttribute("cartItems", cart);
+        }
+
+        // 담을 수 있는 관광지 리스트 표기 - 프론트에서 받아오기
+        List<Area> areaList = callApi.callApi("서울", "관광지");
+        model.addAttribute("areaList", areaList);
         return "cart/list";
     }
 
-    // 삭제
-    @PostMapping("/remove")
-    public String removeFromCart(@RequestParam String placeId, HttpSession session) {
-        String userId = (String) session.getAttribute("loginUserId");
-        cartService.removeCart(userId, placeId);
+    @PostMapping("/add/area/{contentId}")
+    public String addCart(HttpSession session, @PathVariable String contentId){
+        String userId = (String) session.getAttribute("userId");
+
+        cartService.addCart(userId, contentId);
         return "redirect:/cart/list";
     }
+
+
+    // 삭제
+    @PostMapping("/remove/{contentId}")
+    public String removeFromCart(@PathVariable String contentId, HttpSession session) {
+        String userId = (String) session.getAttribute("loginUserId");
+        cartService.removeCart(userId, contentId);
+        return "redirect:/cart/list";
+    }
+
+    @PostMapping("/set-plan")
+    public String setPlan(HttpSession session) {
+        String userId = (String) session.getAttribute("userId");
+        User findUser = userRepository.findById(userId);
+        TripPlan tripPlan = new TripPlan(findUser, 1, 1, 1, 1, 1, 1);
+
+        List<Cart> carts = cartService.getCart(userId);
+        for (Cart cart : carts) {
+            if (cart.getTripPlan() == null) {
+                cart.setTripPlan(tripPlan);
+            }
+        }
+
+        // AI 팀에 넘길 정보들
+        List<Cart> sendList = cartRepository.findByTripPlanId(tripPlan);
+        LocalDate startDate = tripPlan.getStartDate();
+        LocalDate finishDate = tripPlan.getFinishDate();
+        // 여기까지
+
+
+        return "받아온 페이지로 리다이렉트 시키기";
+    }
+
+    // ai 서버로 보내기
 }
