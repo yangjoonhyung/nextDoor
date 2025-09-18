@@ -17,12 +17,11 @@ public class CartService {
     private final UserRepository userRepository;
 
     // 장바구니 담기
-    public void addCart(String userId, String placeId, String placeName) {
+    public void addCart(String userId, String placeId) {
         User user = userRepository.findById(userId);
         Cart item = new Cart();
         item.setUser(user);
         item.setPlaceId(placeId);
-        item.setPlaceName(placeName);
         cartRepository.save(item);
     }
 
