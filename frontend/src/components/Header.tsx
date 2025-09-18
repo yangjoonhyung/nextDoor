@@ -30,7 +30,7 @@ export default function Header() {
                 href="/community"
                 className="text-black hover:text-gray-600 transition-colors"
               >
-                커뮤니티
+                게시글
               </Link>
             </nav>
 

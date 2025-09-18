@@ -23,6 +23,10 @@ public class User {
     private UserState userState;
     private int numberOfReports; // 신고 횟수
 
+    // JPA를 위한 기본 생성자
+    public User() {
+    }
+
     public User(String userId, String password, String name, String email) {
         this.userId = userId;
         this.password = password;

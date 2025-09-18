@@ -1,4 +1,14 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+
 export default function Home() {
+  const router = useRouter();
+
+  const handleStartTravel = () => {
+    router.push('/travel');
+  };
   return (
     <section className="flex flex-col lg:flex-row items-center gap-16 py-20">
       {/* 왼쪽 영역 - 텍스트 + 버튼 */}
@@ -15,7 +25,10 @@ export default function Home() {
         </div>
 
         <div className="mt-10">
-          <button className="bg-[#56A3FF] hover:bg-blue-400 text-white px-8 py-4 rounded-lg transition-colors font-medium text-lg">
+          <button
+            onClick={handleStartTravel}
+            className="bg-[#56A3FF] hover:bg-blue-400 text-white px-8 py-4 rounded-lg transition-colors font-medium text-lg"
+          >
             Next Door 시작하기
           </button>
         </div>
@@ -23,9 +36,11 @@ export default function Home() {
 
       {/* 오른쪽 영역 - 이미지 */}
       <div className="flex-1 flex justify-center">
-        <img
+        <Image
           src="/main-illustration.png"
           alt="여행 경로 일러스트"
+          width={500}
+          height={400}
           className="w-full max-w-[500px] h-auto"
         />
       </div>
