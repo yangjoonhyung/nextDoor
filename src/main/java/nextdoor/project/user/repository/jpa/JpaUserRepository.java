@@ -5,10 +5,12 @@ import lombok.RequiredArgsConstructor;
 import nextdoor.project.user.User;
 import nextdoor.project.user.repository.UserRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Repository
+@Transactional
 @RequiredArgsConstructor
 public class JpaUserRepository implements UserRepository {
 

@@ -25,7 +25,7 @@ public class AiRequest {
         public DaySchedule(String weekday) {
             this.weekday = weekday;
             this.open_hour = 10;
-            this.close_hour = 10;
+            this.close_hour = 22;
         }
     }
 

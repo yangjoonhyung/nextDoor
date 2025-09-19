@@ -75,7 +75,6 @@ public class CartController {
         return "redirect:/cart/list";
     }
 
-
     // 삭제
     @PostMapping("/remove/{contentId}")
     public String removeFromCart(@PathVariable String contentId, HttpSession session) {
@@ -142,7 +141,7 @@ public class CartController {
                 ConfirmTrip save = confirmTripRepository.save(ct);
             }
         }
-
+        cartRepository.deleteCart(tripPlan, findUser);
 
         return "redirect:/get-plan/" + tripPlan.getTripPlanID();
     }
@@ -173,12 +172,4 @@ public class CartController {
         return "mypage/page";
     }
 
-    @PostMapping("/get-plan/{tripPlanId}")
-    public String goToMyPage(HttpSession session) {
-        String userId = (String) session.getAttribute("userId");
-
-        return "redirect:/my-page/plan";
-    }
-
-    // ai 서버로 보내기
 }

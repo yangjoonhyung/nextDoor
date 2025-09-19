@@ -14,4 +14,6 @@ public interface CartRepository {
     void deleteByUserAndPlaceId(User user, String placeId);
 
     List<Cart> findByTripPlanId(TripPlan tripPlan);
+
+    void deleteCart(TripPlan tripPlan, User user);
 }
