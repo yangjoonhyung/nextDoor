@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 // 더미 데이터 타입 정의
 interface TravelDestination {
@@ -13,6 +14,7 @@ interface TravelDestination {
 export default function Travel() {
   const [searchQuery, setSearchQuery] = useState('');
   const [destinations, setDestinations] = useState<TravelDestination[]>([]);
+  const router = useRouter();
 
   // 백엔드 API 연동을 위한 useEffect (나중에 구현)
   useEffect(() => {
@@ -68,6 +70,22 @@ export default function Travel() {
     setDestinations(dummyDestinations);
   }, []);
 
+  // 여행지 클릭 시 cart 페이지로 이동하는 함수
+  const handleDestinationClick = (destination: TravelDestination) => {
+    const params = new URLSearchParams({
+      destination: destination.name,
+      country: destination.country,
+    });
+    router.push(`/cart?${params.toString()}`);
+  };
+
+  // 검색어에 따라 여행지 필터링
+  const filteredDestinations = destinations.filter(
+    destination =>
+      destination.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      destination.country.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -106,29 +124,49 @@ export default function Travel() {
         </div>
 
         {/* 여행지 목록 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {destinations.map((destination, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-            >
-              <div className="relative h-48">
-                <Image
-                  src={destination.image}
-                  alt={destination.name}
-                  fill
-                  className="object-cover rounded-lg hover:scale-105 transition-transform duration-300"
-                />
+        {filteredDestinations.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {filteredDestinations.map((destination, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 group relative"
+              >
+                <div className="relative h-48">
+                  <Image
+                    src={destination.image}
+                    alt={destination.name}
+                    fill
+                    className="object-cover rounded-lg hover:scale-105 transition-transform duration-300"
+                  />
+                  {/* Hover 시 나타나는 오버레이와 버튼 */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+                    <button
+                      onClick={() => handleDestinationClick(destination)}
+                      className="opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 shadow-lg"
+                    >
+                      일정만들기
+                    </button>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-semibold mt-2 text-lg">
+                    {destination.name}
+                  </h3>
+                  <p className="text-sm text-gray-500">{destination.country}</p>
+                </div>
               </div>
-              <div className="p-4">
-                <h3 className="font-semibold mt-2 text-lg">
-                  {destination.name}
-                </h3>
-                <p className="text-sm text-gray-500">{destination.country}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">
+              &ldquo;{searchQuery}&rdquo;에 대한 검색 결과가 없습니다.
+            </p>
+            <p className="text-gray-400 text-sm mt-2">
+              다른 검색어를 시도해보세요.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

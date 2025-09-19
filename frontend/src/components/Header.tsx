@@ -2,18 +2,21 @@ import Link from 'next/link';
 
 export default function Header() {
   return (
-    <header className="fixed top-0 w-full bg-white border-b border-gray-300 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+    <header className="fixed top-0 left-0 right-0 w-full bg-white border-b border-gray-300 z-50">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div
+          className="flex items-center justify-between h-16"
+          style={{ maxWidth: '1152px', margin: '0 auto' }}
+        >
           {/* 로고 섹션 */}
           <Link href="/" className="flex items-center">
             <img src="/logo.png" alt="NextDoor Logo" className="h-12 w-auto" />
           </Link>
 
           {/* 메뉴 및 로그인 버튼 */}
-          <div className="flex items-center space-x-8">
+          <div className="flex items-center space-x-6 lg:space-x-8">
             {/* 네비게이션 메뉴 */}
-            <nav className="hidden md:flex space-x-8">
+            <nav className="hidden md:flex space-x-6 lg:space-x-8">
               <Link
                 href="/travel"
                 className="text-black hover:text-gray-600 transition-colors"

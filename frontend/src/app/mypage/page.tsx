@@ -26,7 +26,7 @@ export default function MyPage() {
 
   // 프로필 관리 페이지로 이동
   const handleProfileManagement = () => {
-    router.push('/mypage/profile');
+    router.push('/profile');
   };
 
   return (
