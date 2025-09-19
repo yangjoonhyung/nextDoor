@@ -6,9 +6,13 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   return (
-    <>
+    <div className="min-h-screen bg-gray-50">
       <Header />
-      <main className="max-w-[1200px] mx-auto px-4 pt-20">{children}</main>
-    </>
+      <main className="w-full px-4 sm:px-6 lg:px-8 pt-20">
+        <div style={{ maxWidth: '1152px', margin: '0 auto' }}>
+          {children}
+        </div>
+      </main>
+    </div>
   );
 }

@@ -3,7 +3,7 @@ package nextdoor.project.board;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import nextdoor.project.plan.Plan;
+import nextdoor.project.tripplan.TripPlan;
 import nextdoor.project.user.User;
 
 import java.time.LocalDateTime;
@@ -26,7 +26,7 @@ public class Board {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_id")
-    private Plan plan; // db에 담겨있는 일정
+    private TripPlan plan; // db에 담겨있는 일정
 
     private LocalDateTime createdAt = LocalDateTime.now();
 }

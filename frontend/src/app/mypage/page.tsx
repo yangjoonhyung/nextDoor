@@ -3,11 +3,20 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function MyPage() {
   const [activeTab, setActiveTab] = useState('schedule');
   const [nickname, setNickname] = useState('');
   const router = useRouter();
+  const { isLoggedIn, isLoading, requireAuth } = useAuth();
+
+  // 로그인 상태 확인
+  useEffect(() => {
+    if (!isLoading) {
+      requireAuth();
+    }
+  }, [isLoading, requireAuth]);
 
   // 랜덤 닉네임 생성
   useEffect(() => {
@@ -24,9 +33,21 @@ export default function MyPage() {
     //   });
   }, []);
 
+  // 로딩 중이거나 로그인되지 않은 경우 로딩 화면 표시
+  if (isLoading || !isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">로그인 상태를 확인하는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
   // 프로필 관리 페이지로 이동
   const handleProfileManagement = () => {
-    router.push('/mypage/profile');
+    router.push('/profile');
   };
 
   return (

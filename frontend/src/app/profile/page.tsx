@@ -34,7 +34,7 @@ export default function ProfilePage() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12">
+      <div className="flex items-center justify-center py-12">
         <div className="w-1/2 bg-white rounded-lg shadow-md p-6 mx-auto">
           {/* 제목 */}
           <h1 className="text-xl font-semibold text-gray-800 mb-6">

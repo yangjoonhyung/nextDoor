@@ -1,19 +1,46 @@
+'use client';
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Header() {
+  const router = useRouter();
+  const { isLoggedIn, isLoading, checkLoginStatus } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('http://localhost:8081/api/users/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        // 로그아웃 후 상태 새로고침
+        await checkLoginStatus();
+        router.push('/');
+      }
+    } catch (error) {
+      console.error('로그아웃 오류:', error);
+    }
+  };
+
   return (
-    <header className="fixed top-0 w-full bg-white border-b border-gray-300 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+    <header className="fixed top-0 left-0 right-0 w-full bg-white border-b border-gray-300 z-50">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div
+          className="flex items-center justify-between h-16"
+          style={{ maxWidth: '1152px', margin: '0 auto' }}
+        >
           {/* 로고 섹션 */}
           <Link href="/" className="flex items-center">
             <img src="/logo.png" alt="NextDoor Logo" className="h-12 w-auto" />
           </Link>
 
-          {/* 메뉴 및 로그인 버튼 */}
-          <div className="flex items-center space-x-8">
+          {/* 메뉴 및 로그인/로그아웃 버튼 */}
+          <div className="flex items-center space-x-6 lg:space-x-8">
             {/* 네비게이션 메뉴 */}
-            <nav className="hidden md:flex space-x-8">
+            <nav className="hidden md:flex space-x-6 lg:space-x-8">
               <Link
                 href="/travel"
                 className="text-black hover:text-gray-600 transition-colors"
@@ -34,13 +61,26 @@ export default function Header() {
               </Link>
             </nav>
 
-            {/* 로그인 버튼 */}
-            <Link
-              href="/login"
-              className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-            >
-              로그인
-            </Link>
+            {/* 로그인/로그아웃 버튼 */}
+            {!isLoading && (
+              <>
+                {isLoggedIn ? (
+                  <button
+                    onClick={handleLogout}
+                    className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                  >
+                    로그아웃
+                  </button>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                  >
+                    로그인
+                  </Link>
+                )}
+              </>
+            )}
 
             {/* 모바일 메뉴 버튼 */}
             <div className="md:hidden">

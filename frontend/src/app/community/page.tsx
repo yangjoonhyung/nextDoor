@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAuth } from '../../hooks/useAuth';
 
 // 게시글 타입 정의
 interface Post {
@@ -13,6 +14,14 @@ interface Post {
 
 export default function Community() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const { isLoggedIn, isLoading, requireAuth } = useAuth();
+
+  // 로그인 상태 확인
+  useEffect(() => {
+    if (!isLoading) {
+      requireAuth();
+    }
+  }, [isLoading, requireAuth]);
 
   // 백엔드 API 연동을 위한 useEffect (나중에 구현)
   useEffect(() => {
@@ -51,6 +60,18 @@ export default function Community() {
     //   });
     setPosts(dummyPosts);
   }, []);
+
+  // 로딩 중이거나 로그인되지 않은 경우 로딩 화면 표시
+  if (isLoading || !isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">로그인 상태를 확인하는 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

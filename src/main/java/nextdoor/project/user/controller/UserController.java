@@ -208,10 +208,16 @@ public class UserController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        userService.changePassword(userId, newPassword);
-        response.put("success", true);
-        response.put("message", "비밀번호가 변경되었습니다.");
-        return ResponseEntity.ok(response);
+        try {
+            userService.changePassword(userId, newPassword);
+            response.put("success", true);
+            response.put("message", "비밀번호가 변경되었습니다.");
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     // 회원 삭제

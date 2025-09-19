@@ -36,6 +36,9 @@ public class JpaUserRepository implements UserRepository {
     @Override
     public void changePassword(String userId, String changePw) {
         User user = em.find(User.class, userId);
+        if (user == null) {
+            throw new IllegalArgumentException("사용자 " + userId + "을 찾을 수 없습니다.");
+        }
         user.setPassword(changePw);
     }
 
@@ -48,12 +51,11 @@ public class JpaUserRepository implements UserRepository {
     @Override
     public User findByEmailAndName(String email, String name) {
         String jpql = "select u from User u where u.email = :email and u.name = :name";
-        User result = em.createQuery(jpql, User.class)
+        List<User> results = em.createQuery(jpql, User.class)
                 .setParameter("email", email)
                 .setParameter("name", name)
-                .getSingleResult();
+                .getResultList();
 
-        return result;
-
+        return results.isEmpty() ? null : results.get(0);
     }
 }
