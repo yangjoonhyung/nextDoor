@@ -5,8 +5,8 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import nextdoor.project.board.Board;
 import nextdoor.project.board.repository.BoardRepository;
-import nextdoor.project.plan.Plan;
-import nextdoor.project.plan.repository.PlanRepository;
+import nextdoor.project.tripplan.TripPlan;
+import nextdoor.project.tripplan.repository.TripPlanRepository;
 import nextdoor.project.user.User;
 import nextdoor.project.user.service.UserService;
 import org.springframework.stereotype.Controller;
@@ -21,7 +21,7 @@ import java.util.List;
 public class BoardController {
 
     private final BoardRepository boardRepository;
-    private final PlanRepository planRepository;
+    private final TripPlanRepository tripPlanRepository;
     private final UserService userService;
 
     // 게시판 메인 - 내가 쓴 게시글 목록
@@ -48,13 +48,13 @@ public class BoardController {
         if (userId == null) return "redirect:/login";
 
         User user = userService.findById(userId);
-        List<Plan> plans = planRepository.findByUser(user); // DB에서 꺼내온 내 일정
+        List<TripPlan> plans = tripPlanRepository.findByUser(user); // DB에서 꺼내온 내 일정
 
         model.addAttribute("plans", plans);
         return "board/writeForm";
     }
 
-    // 게시글 저장 - Plan db 연동해서 저장
+    // 게시글 저장 - TripPlan db 연동해서 저장
     @PostMapping("/write")
     public String writeBoard(HttpServletRequest request, @RequestParam String title, @RequestParam String content,
                              @RequestParam Long planId) {
@@ -64,7 +64,7 @@ public class BoardController {
         if (userId == null) return "redirect:/login";
 
         User user = userService.findById(userId);
-        Plan plan = planRepository.findById(planId).orElse(null);
+        TripPlan plan = tripPlanRepository.findById(planId);
         if (plan == null) {
             // 예외처리 - 유효하지 않은 일정 선택
             return "redirect:/board/write?error=InvalidPlan";
