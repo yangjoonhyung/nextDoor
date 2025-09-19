@@ -6,10 +6,12 @@ import nextdoor.project.tripplan.TripPlan;
 import nextdoor.project.tripplan.repository.TripPlanRepository;
 import nextdoor.project.user.User;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Repository
+@Transactional
 @RequiredArgsConstructor
 public class JpaTripPlanRepository implements TripPlanRepository {
 

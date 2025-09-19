@@ -6,10 +6,12 @@ import nextdoor.project.tripplan.ConfirmTrip;
 import nextdoor.project.tripplan.TripPlan;
 import nextdoor.project.tripplan.repository.ConfirmTripRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Repository
+@Transactional
 @RequiredArgsConstructor
 public class JpaConfirmTripRepository implements ConfirmTripRepository {
 

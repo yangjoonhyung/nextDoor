@@ -29,4 +29,7 @@ public class Board {
     private TripPlan plan; // db에 담겨있는 일정
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    public Board() {
+    }
 }
