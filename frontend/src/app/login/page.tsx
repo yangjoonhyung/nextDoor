@@ -33,7 +33,8 @@ export default function Login() {
 
       if (data.success) {
         // 로그인 성공 시 메인 페이지로 이동
-        router.push('/');
+        // 페이지 새로고침으로 헤더 상태 업데이트
+        window.location.href = '/';
       } else {
         // 로그인 실패 시 오류 메시지 표시
         setErrorMessage(data.message || '로그인에 실패했습니다.');
