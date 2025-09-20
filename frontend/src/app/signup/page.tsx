@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { apiConfig } from '@/utils/api';
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -40,7 +41,12 @@ export default function Signup() {
     setIsCheckingDuplicate(true);
     try {
       const response = await fetch(
-        `http://localhost:8081/api/users/check-duplicate-id?userId=${formData.userId}`
+        `${apiConfig.baseUrl}/api/users/check-duplicate-id?userId=${formData.userId}`,
+        {
+          method: 'GET',
+          headers: apiConfig.headers,
+          credentials: apiConfig.credentials,
+        }
       );
       const data = await response.json();
 
@@ -78,12 +84,10 @@ export default function Signup() {
     }
 
     try {
-      const response = await fetch('http://localhost:8081/api/users/join', {
+      const response = await fetch(`${apiConfig.baseUrl}/api/users/join`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
+        headers: apiConfig.headers,
+        credentials: apiConfig.credentials,
         body: JSON.stringify(formData),
       });
 

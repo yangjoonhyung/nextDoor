@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { apiConfig } from '@/utils/api';
 
 export default function CartPage() {
   const [startDate, setStartDate] = useState<string>('');
@@ -60,12 +61,10 @@ export default function CartPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8081/api/cart/set-plan', {
+      const response = await fetch(`${apiConfig.baseUrl}/api/cart/set-plan`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
+        headers: apiConfig.headers,
+        credentials: apiConfig.credentials,
         body: JSON.stringify({
           startDate,
           endDate,

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { apiConfig } from '@/utils/api';
 
 export default function FindId() {
   const [name, setName] = useState('');
@@ -19,11 +20,9 @@ export default function FindId() {
     setResult(null);
 
     try {
-      const response = await fetch('http://localhost:8081/api/users/findId', {
+      const response = await fetch(`${apiConfig.baseUrl}/api/users/findId`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: apiConfig.headers,
         body: JSON.stringify({
           name: name,
           email: email,
