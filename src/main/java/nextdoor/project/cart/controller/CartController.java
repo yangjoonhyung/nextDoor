@@ -14,6 +14,7 @@ import nextdoor.project.tripplan.ConfirmTrip;
 import nextdoor.project.tripplan.TripPlan;
 import nextdoor.project.tripplan.repository.ConfirmTripRepository;
 import nextdoor.project.tripplan.repository.TripPlanRepository;
+import nextdoor.project.tripplan.service.TripPlanService;
 import nextdoor.project.user.User;
 import nextdoor.project.user.repository.UserRepository;
 import org.springframework.stereotype.Controller;
@@ -40,6 +41,7 @@ public class CartController {
     private final AiService aiService;
     private final TripPlanRepository tripPlanRepository;
     private final ConfirmTripRepository confirmTripRepository;
+    private final TripPlanService tripPlanService;
 
     private final Map<Integer, String> mappingDate = Map.of(
             1, "월요일",
@@ -51,19 +53,55 @@ public class CartController {
             7, "일요일"
     );
 
+    @GetMapping
+    public String setDestination(@RequestParam String destination, HttpSession httpSession, Model model) {
+        String userId = (String) httpSession.getAttribute("userId");
+        TripPlan tripPlan = new TripPlan();
+        tripPlan.setDestination(destination);
+        model.addAttribute("tripPlan", tripPlan);
+        return "";
+    }
+
+    /**
+     * 여기 수정
+     */
+    @PostMapping("/{tripPlanId}")
+    public String setPlan(@PathVariable Long tripPlanId,
+                          @RequestParam Integer startYear,
+                          @RequestParam Integer startMonth,
+                          @RequestParam Integer startDay,
+                          @RequestParam Integer finishYear,
+                          @RequestParam Integer finishMonth,
+                          @RequestParam Integer finishDay,
+                          Model model
+                          ) {
+        TripPlan findTrip = tripPlanRepository.findById(tripPlanId);
+        LocalDate startDate = tripPlanService.setStartDate(startYear, startMonth, startDay);
+        LocalDate finishDate = tripPlanService.setFinishDate(finishYear, finishMonth, finishDay);
+
+        findTrip.setStartDate(startDate);
+        findTrip.setFinishDate(finishDate);
+        return "redirect:/list/" + tripPlanId;
+    }
+
+    /**
+     * 여기 수정
+     */
     // 장바구니 목록
-    @GetMapping("/list")
-    public String cartList(HttpSession session, Model model) {
+    @GetMapping("/list/{tripPlanId}")
+    public String cartList(@PathVariable Long tripPlanId, @RequestParam String type, HttpSession session, Model model) {
         String userId = (String) session.getAttribute("userId");
         List<Cart> cart = cartService.getCart(userId);
         if (cart != null) {
             model.addAttribute("cartItems", cart);
         }
 
-        // 담을 수 있는 관광지 리스트 표기 - 프론트에서 받아오기
-        // 지희한테 버튼 만들어달라해서 밑에 한줄 따로 @postMapping 빼기 이거 할 때 준형이한테 말하기
-        List<Area> areaList = callApi.callApi("서울", "관광지");
+        TripPlan findTrip = tripPlanRepository.findById(tripPlanId);
+        String destination = findTrip.getDestination();
+
+        List<Area> areaList = callApi.callApi(destination, type);
         model.addAttribute("areaList", areaList);
+        model.addAttribute("tripPlanId", tripPlanId);
         return "cart/list";
     }
 
@@ -83,12 +121,11 @@ public class CartController {
         return "redirect:/cart/list";
     }
 
-    @PostMapping("/set-plan")
-    public String setPlan(HttpSession session) {
+    @PostMapping("/set-plan/{tripPlanId}")
+    public String setPlan(@PathVariable Long tripPlanId, HttpSession session) {
         String userId = (String) session.getAttribute("userId");
         User findUser = userRepository.findById(userId);
-        // 시작 연 원 일 도착 연 월 일 지희한테 받아서 여기 입력할 수 있게하기
-        TripPlan tripPlan = new TripPlan(findUser, 1, 1, 1, 1, 1, 1);
+        TripPlan tripPlan = tripPlanRepository.findById(tripPlanId);
 
         List<Cart> carts = cartService.getCart(userId);
         for (Cart cart : carts) {
@@ -171,5 +208,6 @@ public class CartController {
 
         return "mypage/page";
     }
+
 
 }
