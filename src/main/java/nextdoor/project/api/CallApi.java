@@ -39,18 +39,19 @@ public class CallApi {
             "제주도", 39
     );
 
-    private static final Map<String, Integer> mappingContentTypeCode = Map.of(
-            "관광지", 12,
-            "음식점", 39,
-            "숙박", 32,
-            "문화시설", 14
+    private static final Map<String, String> mappingContentTypeCode = Map.of(
+            "전체", "",
+            "관광지", "12",
+            "음식점", "39",
+            "숙박", "32",
+            "문화시설", "14"
     );
 
     // 지역별 관광지 호출
     public List<Area> callApi(String mapAreaCode, String mapContentTypeId) {
 
         Integer areaCode = mappingAreaCode.get(mapAreaCode);
-        Integer contentTypeId = mappingContentTypeCode.get(mapContentTypeId);
+        String contentTypeId = mappingContentTypeCode.get(mapContentTypeId);
 
         String urlStr = CALL_BACK_URL +
                 "?serviceKey=" + AUTH_ENCODING_KEY +
