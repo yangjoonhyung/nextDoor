@@ -64,7 +64,7 @@ export default function Login() {
             type="text"
             placeholder="아이디"
             value={userId}
-            onChange={(e) => setUserId(e.target.value)}
+            onChange={e => setUserId(e.target.value)}
             required
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-400 focus:border-transparent outline-none"
           />
@@ -74,7 +74,7 @@ export default function Login() {
             type="password"
             placeholder="비밀번호"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
             required
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-400 focus:border-transparent outline-none"
           />

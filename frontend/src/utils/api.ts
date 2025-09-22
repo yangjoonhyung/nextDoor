@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 // API URL 설정을 위한 유틸리티 함수
 export const getApiUrl = () => {
   // 프로덕션 환경에서는 EC2 서버의 퍼블릭 IP를 사용

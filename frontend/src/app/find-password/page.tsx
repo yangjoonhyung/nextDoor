@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 'use client';
 
 import { useState } from 'react';
@@ -109,7 +110,7 @@ export default function FindPassword() {
             type="text"
             placeholder="아이디"
             value={userId}
-            onChange={(e) => setUserId(e.target.value)}
+            onChange={e => setUserId(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-400 focus:border-transparent outline-none"
           />
 
@@ -118,7 +119,7 @@ export default function FindPassword() {
             type="password"
             placeholder="새로운 비밀번호"
             value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
+            onChange={e => setNewPassword(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-400 focus:border-transparent outline-none"
           />
 
@@ -127,7 +128,7 @@ export default function FindPassword() {
             type="password"
             placeholder="새로운 비밀번호 확인"
             value={checkPassword}
-            onChange={(e) => setCheckPassword(e.target.value)}
+            onChange={e => setCheckPassword(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-400 focus:border-transparent outline-none"
           />
 
