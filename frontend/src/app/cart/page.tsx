@@ -1,4 +1,5 @@
-/* eslint-disable prettier/prettier */
+export const dynamic = 'force-dynamic';
+export const prerender = false;
 'use client';
 
 import { useState, useEffect } from 'react';
