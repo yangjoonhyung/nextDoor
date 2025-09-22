@@ -1,7 +1,5 @@
-import dynamic from 'next/dynamic';
-
-// Dynamically load the client-side Cart component (no SSR)
-const CartClient = dynamic(() => import('./CartClient'), { ssr: false });
+'use client';
+import CartClient from './CartClient';
 
 export default function CartPage() {
   return <CartClient />;
