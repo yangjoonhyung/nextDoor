@@ -138,7 +138,7 @@ export default function CartListPage() {
 
   // 다음 버튼 클릭 핸들러
   const handleNext = () => {
-    router.push('/accommodation');
+    router.push('/confirm');
   };
 
   return (
@@ -164,7 +164,7 @@ export default function CartListPage() {
           </div>
           <div className="text-center">
             <div className="w-8 h-8 bg-gray-300 rounded-full mx-auto mb-2"></div>
-            <p className="text-sm text-gray-500">STEP 3 숙소 선택</p>
+            <p className="text-sm text-gray-500">STEP 3 경로 완성</p>
           </div>
         </div>
       </div>
