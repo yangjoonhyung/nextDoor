@@ -20,9 +20,11 @@ public class TripPlan {
     @JoinColumn(name = "user_id", referencedColumnName = "userId")
     private User user;
 
+
     private LocalDate startDate;
     private LocalDate finishDate;
     private String title;
+    private String destination;
 
     public TripPlan() {
     }
