@@ -63,22 +63,14 @@ public class CartController {
     }
 
     /**
-     * 여기 수정
+     * 여행 날짜 설정 - 날짜 선택기에서 받아옴
      */
     @PostMapping("/{tripPlanId}")
     public String setPlan(@PathVariable Long tripPlanId,
-                          @RequestParam Integer startYear,
-                          @RequestParam Integer startMonth,
-                          @RequestParam Integer startDay,
-                          @RequestParam Integer finishYear,
-                          @RequestParam Integer finishMonth,
-                          @RequestParam Integer finishDay,
-                          Model model
-                          ) {
+                          @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                          @RequestParam("finishDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate finishDate,
+                          Model model) {
         TripPlan findTrip = tripPlanRepository.findById(tripPlanId);
-        LocalDate startDate = tripPlanService.setStartDate(startYear, startMonth, startDay);
-        LocalDate finishDate = tripPlanService.setFinishDate(finishYear, finishMonth, finishDay);
-
         findTrip.setStartDate(startDate);
         findTrip.setFinishDate(finishDate);
         return "redirect:/list/" + tripPlanId;
