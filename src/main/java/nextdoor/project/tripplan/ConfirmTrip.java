@@ -20,17 +20,17 @@ public class ConfirmTrip {
     private String day;
     private String name;
     private String time;
-    private Long order;
+    private Long tripOrder;
 
     public ConfirmTrip() {
     }
 
-    public ConfirmTrip(TripPlan tripPlan, Long contentId, String day, String name, String time, Long order) {
+    public ConfirmTrip(TripPlan tripPlan, Long contentId, String day, String name, String time, Long tripOrder) {
         this.tripPlan = tripPlan;
         this.contentId = contentId;
         this.day = day;
         this.name = name;
         this.time = time;
-        this.order = order;
+        this.tripOrder = tripOrder;
     }
 }
