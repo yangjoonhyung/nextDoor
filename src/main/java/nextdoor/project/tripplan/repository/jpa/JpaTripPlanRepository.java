@@ -19,12 +19,13 @@ public class JpaTripPlanRepository implements TripPlanRepository {
 
     @Override
     public List<TripPlan> findByUser(User user) {
-        String jpql = "select tripPlan from tripPlan t where t.user.userId = :userId";
+        String jpql = "select t from TripPlan t where t.user.userId = :userId";
         List<TripPlan> userList = em.createQuery(jpql, TripPlan.class)
                 .setParameter("userId", user.getUserId())
                 .getResultList();
         return userList;
     }
+
 
     @Override
     public TripPlan findById(Long tripPlanId) {

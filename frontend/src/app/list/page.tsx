@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Layout from '@/components/Layout';
+import { apiConfig } from '@/utils/api';
+import { useAuth } from '@/hooks/useAuth';
 
 // 더미 데이터 타입 정의
 interface Place {
@@ -16,7 +18,74 @@ export default function CartListPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPlaces, setSelectedPlaces] = useState<Place[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
+  const [areaList, setAreaList] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { isLoggedIn, isLoading: authLoading, requireAuth } = useAuth();
+
+  // contentTypeId를 카테고리로 매핑하는 함수
+  const getCategoryFromContentTypeId = (contentTypeId: string): string => {
+    const categoryMap: { [key: string]: string } = {
+      '12': '관광지',
+      '39': '음식점', 
+      '32': '숙박',
+      '14': '문화시설'
+    };
+    return categoryMap[contentTypeId] || '기타';
+  };
+
+  // 로그인 상태 확인 후 데이터 가져오기
+  useEffect(() => {
+    // 인증 로딩이 완료된 후에만 실행
+    if (authLoading) return;
+    
+    // 로그인하지 않은 경우 로그인 페이지로 리다이렉트
+    if (!requireAuth()) return;
+    
+    const fetchData = async () => {
+      try {
+        const tripPlanId = searchParams.get('tripPlanId');
+        const type = searchParams.get('type') || '전체';
+        
+        if (tripPlanId) {
+          console.log('백엔드 API 호출:', `/cart/list/${tripPlanId}?type=${type}`);
+          const response = await fetch(
+            `${apiConfig.baseUrl}/cart/list/${tripPlanId}?type=${type}`,
+            {
+              method: 'GET',
+              credentials: apiConfig.credentials,
+            }
+          );
+          
+          if (response.ok) {
+            // 백엔드에서 JSON 응답을 받음
+            const data = await response.json();
+            console.log('백엔드 응답:', data);
+            
+            if (data.success && data.areaList) {
+              setAreaList(data.areaList);
+            } else if (!data.success) {
+              console.error('백엔드 에러:', data.error);
+              if (data.redirect) {
+                // 로그인이 필요한 경우 로그인 페이지로 리다이렉트
+                router.push(data.redirect);
+              }
+            }
+          } else {
+            console.error('API 호출 실패:', response.status);
+          }
+        }
+      } catch (error) {
+        console.error('API 호출 오류:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [searchParams, authLoading, requireAuth]);
 
   // 더미 장소 데이터
   const places: Place[] = [
@@ -124,6 +193,19 @@ export default function CartListPage() {
     return matchesSearch && matchesCategory;
   });
 
+  // 백엔드 데이터도 검색어와 카테고리에 따라 필터링
+  const filteredAreaList = areaList.filter(place => {
+    const matchesSearch =
+      (place.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (place.addr1 || '').toLowerCase().includes(searchQuery.toLowerCase());
+
+    const placeCategory = getCategoryFromContentTypeId(place.contentTypeId || '');
+    const matchesCategory =
+      selectedCategory === '전체' || placeCategory === selectedCategory;
+
+    return matchesSearch && matchesCategory;
+  });
+
   // 장소 추가 함수
   const addPlace = (place: Place) => {
     if (!selectedPlaces.find(p => p.id === place.id)) {
@@ -140,6 +222,17 @@ export default function CartListPage() {
   const handleNext = () => {
     router.push('/accommodation');
   };
+
+  // 인증 로딩 중이거나 데이터 로딩 중일 때 로딩 표시
+  if (authLoading || isLoading) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg text-gray-600">로딩 중...</div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -225,30 +318,46 @@ export default function CartListPage() {
 
             {/* 장소 목록 */}
             <div className="space-y-3 max-h-[calc(100vh-500px)] overflow-y-auto">
-              {filteredPlaces.map(place => {
-                const isSelected = selectedPlaces.some(p => p.id === place.id);
+              {(areaList.length > 0 ? filteredAreaList : filteredPlaces).map((place, index) => {
+                // 백엔드 데이터와 더미 데이터 구조 통합
+                const placeData = areaList.length > 0 ? {
+                  id: place.contentId || index,
+                  name: place.title || place.name,
+                  address: place.addr1 || place.address,
+                  category: getCategoryFromContentTypeId(place.contentTypeId || '')
+                } : place;
+                
+                const isSelected = selectedPlaces.some(p => p.id === placeData.id);
                 return (
                   <div
-                    key={place.id}
+                    key={placeData.id}
                     className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
                   >
-                    <div className="w-12 h-12 bg-gray-200 rounded-lg mr-3 flex-shrink-0"></div>
+                    <div className="w-12 h-12 bg-gray-200 rounded-lg mr-3 flex-shrink-0">
+                      {place.firstImage && (
+                        <img 
+                          src={place.firstImage} 
+                          alt={placeData.name}
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      )}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-medium text-gray-900 truncate">
-                          {place.name}
+                          {placeData.name}
                         </h3>
                         <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                          {place.category}
+                          {placeData.category}
                         </span>
                       </div>
                       <p className="text-sm text-gray-500 truncate">
-                        {place.address}
+                        {placeData.address}
                       </p>
                     </div>
                     <button
                       onClick={() =>
-                        isSelected ? removePlace(place.id) : addPlace(place)
+                        isSelected ? removePlace(placeData.id) : addPlace(placeData)
                       }
                       className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${
                         isSelected

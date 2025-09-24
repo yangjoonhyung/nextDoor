@@ -47,40 +47,91 @@ export default function CartPage() {
       return;
     }
 
-    // 콘솔에 선택된 날짜 출력
-    console.log('선택된 여행 기간:', {
-      startDate,
-      endDate,
-    });
+    // 날짜를 Date 객체로 변환하여 연, 월, 일 추출
+    const startDateObj = new Date(startDate);
+    const endDateObj = new Date(endDate);
 
-    // list 페이지로 바로 이동
-    router.push('/list');
+    const startYear = startDateObj.getFullYear();
+    const startMonth = startDateObj.getMonth() + 1; // getMonth()는 0부터 시작하므로 +1
+    const startDay = startDateObj.getDate();
+
+    const finishYear = endDateObj.getFullYear();
+    const finishMonth = endDateObj.getMonth() + 1; // getMonth()는 0부터 시작하므로 +1
+    const finishDay = endDateObj.getDate();
+
+    // tripPlanId 가져오기 (URL 파라미터에서 또는 새로 생성)
+    const tripPlanId = searchParams.get('tripPlanId') || Date.now().toString();
+
+    // 백엔드로 데이터 전송
+    await sendPlanToBackend(
+      startYear,
+      startMonth,
+      startDay,
+      finishYear,
+      finishMonth,
+      finishDay,
+      tripPlanId
+    );
   };
 
-  const sendPlanToBackend = async (startDate: string, endDate: string) => {
+  const sendPlanToBackend = async (
+    startYear: number,
+    startMonth: number,
+    startDay: number,
+    finishYear: number,
+    finishMonth: number,
+    finishDay: number,
+    tripPlanId: string
+  ) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${apiConfig.baseUrl}/api/cart/set-plan`, {
-        method: 'POST',
-        headers: apiConfig.headers,
-        credentials: apiConfig.credentials,
-        body: JSON.stringify({
-          startDate,
-          endDate,
-        }),
-      });
+      // POST 요청 본문에 데이터 전달
+      const formData = new FormData();
+      formData.append('startYear', startYear.toString());
+      formData.append('startMonth', startMonth.toString());
+      formData.append('startDay', startDay.toString());
+      formData.append('finishYear', finishYear.toString());
+      formData.append('finishMonth', finishMonth.toString());
+      formData.append('finishDay', finishDay.toString());
+      formData.append('destination', selectedDestination?.name || '서울');
 
-      const data = await response.json();
+      const response = await fetch(
+        `${apiConfig.baseUrl}/cart/${tripPlanId}`,
+        {
+          method: 'POST',
+          body: formData,
+          credentials: apiConfig.credentials,
+        }
+      );
 
       if (response.ok) {
-        console.log('여행 계획이 성공적으로 저장되었습니다:', data);
-        alert('여행 기간이 설정되었습니다!');
-        // list 페이지로 이동
-        router.push('/list');
+        const responseText = await response.text();
+        try {
+          const data = JSON.parse(responseText);
+          if (data.success) {
+            console.log('여행 계획이 성공적으로 저장되었습니다.');
+            alert('여행 기간이 설정되었습니다!');
+            // 백엔드에서 반환된 실제 tripPlanId 사용
+            const actualTripPlanId = data.tripPlanId || tripPlanId;
+            router.push(`/list?tripPlanId=${actualTripPlanId}&type=전체`);
+          } else {
+            alert(data.error || '여행 기간 설정에 실패했습니다.');
+          }
+        } catch (parseError) {
+          // JSON 파싱 실패 시 기존 로직 사용
+          if (responseText === 'success') {
+            console.log('여행 계획이 성공적으로 저장되었습니다.');
+            alert('여행 기간이 설정되었습니다!');
+            router.push(`/list?tripPlanId=${tripPlanId}&type=전체`);
+          } else {
+            alert(responseText);
+          }
+        }
       } else {
-        console.error('여행 계획 저장 실패:', data);
-        alert('여행 기간 설정에 실패했습니다.');
+        const errorText = await response.text();
+        console.error('여행 계획 저장 실패:', errorText);
+        alert(errorText || '여행 기간 설정에 실패했습니다.');
       }
     } catch (error) {
       console.error('API 호출 오류:', error);
