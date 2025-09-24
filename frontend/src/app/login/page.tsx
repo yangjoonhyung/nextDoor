@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { apiConfig } from '@/utils/api';
 
 export default function Login() {
   const [userId, setUserId] = useState('');
@@ -17,12 +18,10 @@ export default function Login() {
     setErrorMessage('');
 
     try {
-      const response = await fetch('http://localhost:8081/api/users/login', {
+      const response = await fetch(`${apiConfig.baseUrl}/api/users/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // 세션 쿠키를 포함하여 요청
+        headers: apiConfig.headers,
+        credentials: apiConfig.credentials,
         body: JSON.stringify({
           userId: userId,
           password: password,

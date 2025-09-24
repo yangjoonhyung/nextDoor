@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { apiConfig } from '@/utils/api';
 
 export const useAuth = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -16,9 +17,9 @@ export const useAuth = () => {
 
   const checkLoginStatus = async () => {
     try {
-      const response = await fetch('http://localhost:8081/api/users', {
+      const response = await fetch(`${apiConfig.baseUrl}/api/users`, {
         method: 'GET',
-        credentials: 'include',
+        credentials: apiConfig.credentials,
       });
 
       if (response.ok) {
