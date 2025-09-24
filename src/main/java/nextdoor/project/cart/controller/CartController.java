@@ -60,7 +60,7 @@ public class CartController {
         tripPlan.setDestination(destination);
         TripPlan saveTripPlan = tripPlanRepository.save(tripPlan);
         model.addAttribute("tripPlan", saveTripPlan);
-        return "";
+        return "app/cart";
     }
 
     /**
