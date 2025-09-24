@@ -58,15 +58,15 @@ public class CartController {
         String userId = (String) httpSession.getAttribute("userId");
         TripPlan tripPlan = new TripPlan();
         tripPlan.setDestination(destination);
-        TripPlan saveTripPlan = tripPlanRepository.save(tripPlan);
-        model.addAttribute("tripPlan", saveTripPlan);
-        return "app/cart";
+        model.addAttribute("tripPlan", tripPlan);
+        return "";
     }
 
     /**
      * 여기 수정
      */
     @PostMapping("/{tripPlanId}")
+    @ResponseBody
     public String setPlan(@PathVariable Long tripPlanId,
                           @RequestParam Integer startYear,
                           @RequestParam Integer startMonth,
@@ -74,15 +74,60 @@ public class CartController {
                           @RequestParam Integer finishYear,
                           @RequestParam Integer finishMonth,
                           @RequestParam Integer finishDay,
+                          @RequestParam String destination,
+                          HttpSession session,
                           Model model
-                          ) {
-        TripPlan findTrip = tripPlanRepository.findById(tripPlanId);
-        LocalDate startDate = tripPlanService.setStartDate(startYear, startMonth, startDay);
-        LocalDate finishDate = tripPlanService.setFinishDate(finishYear, finishMonth, finishDay);
+    ) {
+        try {
+            System.out.println("=== CartController.setPlan 시작 ===");
+            System.out.println("tripPlanId: " + tripPlanId);
+            System.out.println("destination: " + destination);
 
-        findTrip.setStartDate(startDate);
-        findTrip.setFinishDate(finishDate);
-        return "redirect:/list/" + tripPlanId;
+            // TripPlan 찾기 또는 생성 (사용자 없이도 가능)
+            System.out.println("TripPlan 찾기 시작");
+            TripPlan findTrip = tripPlanRepository.findById(tripPlanId);
+            System.out.println("findTrip: " + findTrip);
+
+            if (findTrip == null) {
+                System.out.println("새 TripPlan 생성");
+                // TripPlan이 없으면 새로 생성
+                findTrip = new TripPlan();
+
+                // 로그인한 사용자 정보 가져오기
+                String userId = (String) session.getAttribute("userId");
+                if (userId != null) {
+                    User user = userRepository.findById(userId);
+                    findTrip.setUser(user);
+                    System.out.println("사용자 정보 설정: " + userId);
+                } else {
+                    findTrip.setUser(null);
+                    System.out.println("로그인하지 않은 사용자");
+                }
+
+                findTrip.setDestination(destination); // 프론트엔드에서 전달받은 목적지
+                findTrip.setTitle(startYear + "년 " + startMonth + "월 " + startDay + "일 " + destination + " 여행"); // 제목 설정
+
+                // 먼저 저장하여 ID 생성
+                TripPlan tempSaved = tripPlanRepository.save(findTrip);
+                findTrip = tempSaved;
+                System.out.println("임시 저장 완료, ID: " + findTrip.getTripPlanID());
+            }
+
+            System.out.println("날짜 설정 시작");
+            LocalDate startDate = tripPlanService.setStartDate(startYear, startMonth, startDay);
+            LocalDate finishDate = tripPlanService.setFinishDate(finishYear, finishMonth, finishDay);
+
+            findTrip.setStartDate(startDate);
+            findTrip.setFinishDate(finishDate);
+            System.out.println("TripPlan 저장 시작");
+            TripPlan savedTrip = tripPlanRepository.save(findTrip); // 변경사항 저장
+            System.out.println("저장 완료: " + savedTrip.getTripPlanID());
+            return "{\"success\": true, \"tripPlanId\": " + savedTrip.getTripPlanID() + "}"; // 성공 응답과 ID 반환
+        } catch (Exception e) {
+            System.out.println("에러 발생: " + e.getMessage());
+            e.printStackTrace();
+            return "error: " + e.getMessage();
+        }
     }
 
     /**
@@ -90,20 +135,68 @@ public class CartController {
      */
     // 장바구니 목록
     @GetMapping("/list/{tripPlanId}")
+    @ResponseBody
     public String cartList(@PathVariable Long tripPlanId, @RequestParam String type, HttpSession session, Model model) {
-        String userId = (String) session.getAttribute("userId");
-        List<Cart> cart = cartService.getCart(userId);
-        if (cart != null) {
-            model.addAttribute("cartItems", cart);
+        try {
+            System.out.println("=== cartList 시작 ===");
+            System.out.println("tripPlanId: " + tripPlanId);
+            System.out.println("type: " + type);
+
+            String userId = (String) session.getAttribute("userId");
+            System.out.println("userId: " + userId);
+
+            // 로그인하지 않은 사용자는 접근 불가
+            if (userId == null) {
+                System.out.println("로그인하지 않은 사용자 접근 시도");
+                return "{\"success\": false, \"error\": \"로그인이 필요합니다\", \"redirect\": \"/login\"}";
+            }
+
+            List<Cart> cart = cartService.getCart(userId);
+            if (cart != null) {
+                model.addAttribute("cartItems", cart);
+            }
+
+            System.out.println("TripPlan 찾기 시작");
+            TripPlan findTrip = tripPlanRepository.findById(tripPlanId);
+            System.out.println("findTrip: " + findTrip);
+
+            if (findTrip == null) {
+                System.out.println("TripPlan이 없습니다!");
+                return "{\"success\": false, \"error\": \"TripPlan을 찾을 수 없습니다\"}";
+            }
+
+            String destination = findTrip.getDestination();
+            System.out.println("destination: " + destination);
+
+            System.out.println("API 호출 시작");
+            List<Area> areaList = callApi.callApi(destination, type);
+            System.out.println("API 호출 완료, areaList 크기: " + (areaList != null ? areaList.size() : "null"));
+
+            // JSON 응답을 위한 간단한 문자열 반환 (실제로는 JSON 라이브러리 사용 권장)
+            StringBuilder jsonResponse = new StringBuilder();
+            jsonResponse.append("{\"success\": true, \"areaList\": [");
+
+            if (areaList != null && !areaList.isEmpty()) {
+                for (int i = 0; i < areaList.size(); i++) {
+                    Area area = areaList.get(i);
+                    if (i > 0) jsonResponse.append(",");
+                    jsonResponse.append("{")
+                            .append("\"contentId\": \"").append(escapeJson(area.getContentid())).append("\",")
+                            .append("\"title\": \"").append(escapeJson(area.getTitle())).append("\",")
+                            .append("\"addr1\": \"").append(escapeJson(area.getAddr1())).append("\",")
+                            .append("\"firstImage\": \"").append(escapeJson(area.getFirstimage())).append("\",")
+                            .append("\"contentTypeId\": \"").append(escapeJson(area.getContenttypeid())).append("\"")
+                            .append("}");
+                }
+            }
+
+            jsonResponse.append("], \"tripPlanId\": ").append(tripPlanId).append("}");
+            return jsonResponse.toString();
+        } catch (Exception e) {
+            System.out.println("cartList 에러 발생: " + e.getMessage());
+            e.printStackTrace();
+            return "{\"success\": false, \"error\": \"" + e.getMessage() + "\"}";
         }
-
-        TripPlan findTrip = tripPlanRepository.findById(tripPlanId);
-        String destination = findTrip.getDestination();
-
-        List<Area> areaList = callApi.callApi(destination, type);
-        model.addAttribute("areaList", areaList);
-        model.addAttribute("tripPlanId", tripPlanId);
-        return "cart/list";
     }
 
     @PostMapping("/add/area/{contentId}")
@@ -210,5 +303,14 @@ public class CartController {
         return "mypage/page";
     }
 
+    // JSON 이스케이프 메서드
+    private String escapeJson(String str) {
+        if (str == null) return "";
+        return str.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
+    }
 
 }

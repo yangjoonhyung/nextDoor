@@ -69,7 +69,7 @@ public class CallApi {
 
         List<Area> allAreas = new ArrayList<>();
         int pageNo = 1;
-        int numOfRows = getAllData ? 1000 : 100; // 모든 데이터를 가져올 때는 1000개씩
+        int numOfRows = 50; // 일단 50개씩 받고 나중에는 전부 받기
         
         while (true) {
             StringBuilder urlBuilder = new StringBuilder(CALL_BACK_URL);
