@@ -58,6 +58,7 @@ public class CartController {
         String userId = (String) httpSession.getAttribute("userId");
         TripPlan tripPlan = new TripPlan();
         tripPlan.setDestination(destination);
+        tripPlanRepository.save(tripPlan);
         model.addAttribute("tripPlan", tripPlan);
         return "";
     }

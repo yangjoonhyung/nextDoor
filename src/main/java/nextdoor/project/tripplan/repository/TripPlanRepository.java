@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface TripPlanRepository {
 
+    TripPlan save(TripPlan tripPlan);
+
     List<TripPlan> findByUser(User user);
 
     TripPlan findById(Long tripPlanId);
