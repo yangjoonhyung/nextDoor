@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Layout from '@/components/Layout';
 import { apiConfig } from '@/utils/api';
@@ -14,7 +14,7 @@ interface Place {
   category: '음식점' | '관광지' | '문화시설';
 }
 
-export default function CartListPage() {
+function CartListPageInner() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPlaces, setSelectedPlaces] = useState<Place[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
@@ -451,5 +451,13 @@ export default function CartListPage() {
         </button>
       </div>
     </Layout>
+  );
+}
+
+export default function CartListPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CartListPageInner />
+    </Suspense>
   );
 }

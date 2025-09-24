@@ -32,4 +32,14 @@ public class JpaTripPlanRepository implements TripPlanRepository {
         TripPlan tripPlan = em.find(TripPlan.class, tripPlanId);
         return tripPlan;
     }
+    
+    @Override
+    public TripPlan save(TripPlan tripPlan) {
+        if (tripPlan.getTripPlanID() == null) {
+            em.persist(tripPlan);
+        } else {
+            em.merge(tripPlan);
+        }
+        return tripPlan;
+    }
 }

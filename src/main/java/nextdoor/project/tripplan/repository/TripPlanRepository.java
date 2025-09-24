@@ -10,5 +10,7 @@ public interface TripPlanRepository {
     List<TripPlan> findByUser(User user);
 
     TripPlan findById(Long tripPlanId);
+    
+    TripPlan save(TripPlan tripPlan);
 
 }
