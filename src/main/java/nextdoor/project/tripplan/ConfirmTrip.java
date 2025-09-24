@@ -26,11 +26,11 @@ public class ConfirmTrip {
     }
 
     public ConfirmTrip(TripPlan tripPlan, Long contentId, String day, String name, String time, Long tripOrder) {
-            this.tripPlan = tripPlan;
-            this.contentId = contentId;
-            this.day = day;
-            this.name = name;
-            this.time = time;
-            this.tripOrder = tripOrder;
-        }
+        this.tripPlan = tripPlan;
+        this.contentId = contentId;
+        this.day = day;
+        this.name = name;
+        this.time = time;
+        this.tripOrder = tripOrder;
     }
+}

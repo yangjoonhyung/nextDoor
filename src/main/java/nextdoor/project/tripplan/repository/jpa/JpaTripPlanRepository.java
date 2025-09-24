@@ -18,6 +18,12 @@ public class JpaTripPlanRepository implements TripPlanRepository {
     private final EntityManager em;
 
     @Override
+    public TripPlan save(TripPlan tripPlan) {
+        em.persist(tripPlan);
+        return tripPlan;
+    }
+
+    @Override
     public List<TripPlan> findByUser(User user) {
         String jpql = "select tripPlan from tripPlan t where t.user.userId = :userId";
         List<TripPlan> userList = em.createQuery(jpql, TripPlan.class)
