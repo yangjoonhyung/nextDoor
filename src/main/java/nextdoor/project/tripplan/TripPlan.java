@@ -16,7 +16,7 @@ public class TripPlan {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long tripPlanID;
 
-    @ManyToOne
+    @ManyToOne(optional = true)
     @JoinColumn(name = "user_id", referencedColumnName = "userId")
     private User user;
 

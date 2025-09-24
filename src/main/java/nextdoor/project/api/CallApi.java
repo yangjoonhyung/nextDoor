@@ -7,6 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,31 +51,109 @@ public class CallApi {
             "문화시설", "14"
     );
 
-    // 지역별 관광지 호출
+    // 지역별 관광지 호출 (모든 데이터 가져오기)
     public List<Area> callApi(String mapAreaCode, String mapContentTypeId) {
+        return callApiWithPagination(mapAreaCode, mapContentTypeId, true);
+    }
 
+    // 페이지네이션으로 모든 데이터 가져오기
+    public List<Area> callApiWithPagination(String mapAreaCode, String mapContentTypeId, boolean getAllData) {
         Integer areaCode = mappingAreaCode.get(mapAreaCode);
         String contentTypeId = mappingContentTypeCode.get(mapContentTypeId);
+        
+        // 디버깅 로그 추가
+        System.out.println("입력된 mapAreaCode: '" + mapAreaCode + "'");
+        System.out.println("입력된 mapContentTypeId: '" + mapContentTypeId + "'");
+        System.out.println("매핑된 areaCode: " + areaCode);
+        System.out.println("매핑된 contentTypeId: '" + contentTypeId + "'");
 
-        String urlStr = CALL_BACK_URL +
-                "?serviceKey=" + AUTH_ENCODING_KEY +
-                "&_type=" + TYPE +
-                "&contentTypeId=" + contentTypeId +
-                "&areaCode=" + areaCode +
-                "&MobileApp=AppTest" +
-                "&MobileOS=ETC";
+        List<Area> allAreas = new ArrayList<>();
+        int pageNo = 1;
+        int numOfRows = getAllData ? 1000 : 100; // 모든 데이터를 가져올 때는 1000개씩
+        
+        while (true) {
+            StringBuilder urlBuilder = new StringBuilder(CALL_BACK_URL);
+            urlBuilder.append("?serviceKey=").append(AUTH_ENCODING_KEY);
+            urlBuilder.append("&_type=").append(TYPE);
+            
+            // contentTypeId가 빈 문자열이 아닐 때만 추가
+            if (contentTypeId != null && !contentTypeId.isEmpty()) {
+                urlBuilder.append("&contentTypeId=").append(contentTypeId);
+            }
+            
+            urlBuilder.append("&areaCode=").append(areaCode);
+            urlBuilder.append("&numOfRows=").append(numOfRows);
+            urlBuilder.append("&pageNo=").append(pageNo);
+            urlBuilder.append("&MobileApp=AppTest");
+            urlBuilder.append("&MobileOS=ETC");
+            
+            String urlStr = urlBuilder.toString();
 
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            String response = restTemplate.getForObject(urlStr, String.class);
+            try {
+                RestTemplate restTemplate = new RestTemplate();
+                URI uri = URI.create(urlStr);
+                String response = restTemplate.getForObject(uri, String.class);
+                
+                // API 응답 로그 출력
+                System.out.println("API URL (페이지 " + pageNo + "): " + urlStr);
+                System.out.println("API 응답 (처음 500자): " + (response != null ? response.substring(0, Math.min(500, response.length())) : "null"));
+                
+                // 응답이 HTML인지 확인
+                if (response != null && response.trim().startsWith("<")) {
+                    System.out.println("API 응답이 HTML입니다. API 키나 URL을 확인해주세요.");
+                    System.out.println("전체 응답: " + response);
+                    break;
+                }
 
-            JsonNode root = objectMapper.readTree(response);
-            JsonNode itemsNode = root.path("response").path("body").path("items").path("item");
-
-            return objectMapper.readValue(itemsNode.toString(), new TypeReference<List<Area>>() {});
-        } catch (Exception e) {
-            e.printStackTrace();
-            return List.of(); // 예외 발생 시 빈 리스트 반환
+                JsonNode root = objectMapper.readTree(response);
+                JsonNode itemsNode = root.path("response").path("body").path("items");
+                
+                // items가 빈 문자열이거나 null인지 확인
+                if (itemsNode.isTextual() && itemsNode.asText().isEmpty()) {
+                    System.out.println("페이지 " + pageNo + "에서 더 이상 데이터가 없습니다. (items가 빈 문자열)");
+                    break;
+                }
+                
+                JsonNode itemNode = itemsNode.path("item");
+                
+                // item이 존재하지 않거나 빈 배열인지 확인
+                if (itemNode.isMissingNode() || itemNode.isNull() || (itemNode.isArray() && itemNode.size() == 0)) {
+                    System.out.println("페이지 " + pageNo + "에서 더 이상 데이터가 없습니다. (item이 없음)");
+                    break;
+                }
+                
+                // 현재 페이지의 데이터 가져오기
+                List<Area> currentPageAreas = objectMapper.readValue(itemNode.toString(), new TypeReference<List<Area>>() {});
+                
+                if (currentPageAreas.isEmpty()) {
+                    System.out.println("페이지 " + pageNo + "에서 더 이상 데이터가 없습니다.");
+                    break;
+                }
+                
+                allAreas.addAll(currentPageAreas);
+                System.out.println("페이지 " + pageNo + "에서 " + currentPageAreas.size() + "개 데이터 수집. 총 " + allAreas.size() + "개");
+                
+                // 모든 데이터를 가져오는 경우가 아니면 첫 페이지만 가져오고 종료
+                if (!getAllData) {
+                    break;
+                }
+                
+                pageNo++;
+                
+                // 무한 루프 방지 (최대 50페이지)
+                if (pageNo > 50) {
+                    System.out.println("최대 페이지 수(50)에 도달했습니다.");
+                    break;
+                }
+                
+            } catch (Exception e) {
+                System.out.println("API 호출 에러 (페이지 " + pageNo + "): " + e.getMessage());
+                e.printStackTrace();
+                break;
+            }
         }
+        
+        System.out.println("총 " + allAreas.size() + "개의 데이터를 수집했습니다.");
+        return allAreas;
     }
 }

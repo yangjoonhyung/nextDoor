@@ -26,7 +26,7 @@ public class JpaCartRepository implements CartRepository {
 
     @Override
     public List<Cart> findByUser(User user) {
-        String jpql = "select cart from cart c where c.user.userId = :userId";
+        String jpql = "select c from Cart c where c.user.userId = :userId";
         List<Cart> resultList = em.createQuery(jpql, Cart.class)
                 .setParameter("userId", user.getUserId())
                 .getResultList();
@@ -36,7 +36,7 @@ public class JpaCartRepository implements CartRepository {
 
     @Override
     public void deleteByUserAndPlaceId(User user, String placeId) {
-        String jpql = "delete from cart c where c.user = :user and c.placeId = :placeId";
+        String jpql = "delete from Cart c where c.user = :user and c.placeId = :placeId";
         em.createQuery(jpql)
                 .setParameter("user", user)
                 .setParameter("placeId", placeId)
@@ -45,7 +45,7 @@ public class JpaCartRepository implements CartRepository {
 
     @Override
     public List<Cart> findByTripPlanId(TripPlan tripPlan) {
-        String jpql = "select cart from cart c where c.tripPlan.tripPlanId = :tripPlanId";
+        String jpql = "select c from Cart c where c.tripPlan.tripPlanId = :tripPlanId";
         List<Cart> resultList = em.createQuery(jpql, Cart.class)
                 .setParameter("tripPlanId", tripPlan.getTripPlanID())
                 .getResultList();
@@ -55,7 +55,7 @@ public class JpaCartRepository implements CartRepository {
 
     @Override
     public void deleteCart(TripPlan tripPlan, User user) {
-        String jpql = "delete from cart c where c.tripPlan = :tripPlan and c.user = :user";
+        String jpql = "delete from Cart c where c.tripPlan = :tripPlan and c.user = :user";
         em.createQuery(jpql)
                 .setParameter("tripPlan", tripPlan)
                 .setParameter("user", user)
