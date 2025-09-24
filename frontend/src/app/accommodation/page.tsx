@@ -47,7 +47,7 @@ export default function AccommodationPage() {
       {/* 상단 정보 */}
       <div className="mb-6">
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-gray-900">도쿄</h1>
+          <h1 className="text-2xl font-bold text-gray-900">부산</h1>
           <p className="text-gray-600">2025.09.19(금) - 2025.09.26(금)</p>
         </div>
 

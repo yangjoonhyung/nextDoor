@@ -18,19 +18,25 @@ export default function ConfirmPage() {
   // 더미 경로 데이터
   const dummyRoutes: DummyRoutes = {
     1: [
-      { day: 1, items: ['도쿄 타워', '시부야 스카이', '아키하바라'] },
-      { day: 2, items: ['센소지', '신주쿠', '하라주쿠'] },
-      { day: 3, items: ['우에노 공원', '아사쿠사', '스카이 트리'] },
+      { day: 1, items: ['해운대 해수욕장', '부산타워', '자갈치시장'] },
+      { day: 2, items: ['감천문화마을', '태종대', '국제시장'] },
+      {
+        day: 3,
+        items: ['광안리 해수욕장', '송도해상케이블카', '부산아쿠아리움'],
+      },
     ],
     2: [
-      { day: 1, items: ['시부야 스크램블 스퀘어', '하라주쿠', '오모테산도'] },
-      { day: 2, items: ['신주쿠', '도쿄 국립박물관', '우에노 공원'] },
-      { day: 3, items: ['도쿄 타워', '아키하바라', '센소지'] },
+      { day: 1, items: ['부산타워', '자갈치시장', '국제시장'] },
+      {
+        day: 2,
+        items: ['해운대 해수욕장', '부산시립미술관', '부산어촌민속관'],
+      },
+      { day: 3, items: ['감천문화마을', '태종대', '광안리 해수욕장'] },
     ],
     3: [
-      { day: 1, items: ['아사쿠사', '스카이 트리', '도쿄 스카이 트리 타운'] },
-      { day: 2, items: ['하라주쿠', '시부야', '오모테산도'] },
-      { day: 3, items: ['신주쿠', '도쿄 타워', '아키하바라'] },
+      { day: 1, items: ['태종대', '송도해상케이블카', '부산대교'] },
+      { day: 2, items: ['감천문화마을', '해운대 해수욕장', '부산타워'] },
+      { day: 3, items: ['자갈치시장', '국제시장', '광안리 해수욕장'] },
     ],
   };
 
@@ -45,7 +51,7 @@ export default function ConfirmPage() {
       {/* 상단 정보 */}
       <div className="mb-6">
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-gray-900">도쿄</h1>
+          <h1 className="text-2xl font-bold text-gray-900">부산</h1>
           <p className="text-gray-600">2025.09.19(금) - 2025.09.26(금)</p>
         </div>
 
@@ -53,11 +59,23 @@ export default function ConfirmPage() {
         <div className="text-center py-4">
           <div className="inline-flex items-center px-6 py-3 bg-green-50 border border-green-200 rounded-lg">
             <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <svg
+                className="w-4 h-4 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
-            <span className="text-green-700 font-medium text-lg">경로가 완성되었습니다!</span>
+            <span className="text-green-700 font-medium text-lg">
+              경로가 완성되었습니다!
+            </span>
           </div>
         </div>
       </div>
@@ -67,7 +85,9 @@ export default function ConfirmPage() {
         {/* 왼쪽: 경로 추천 목록 */}
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-4 border-b">
-            <h2 className="text-lg font-semibold text-gray-900">AI 추천 경로</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              AI 추천 경로
+            </h2>
           </div>
           <div className="p-4">
             <div className="space-y-3">
