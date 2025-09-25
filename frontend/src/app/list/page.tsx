@@ -52,7 +52,7 @@ function CartListPageInner() {
         if (tripPlanId) {
           console.log('백엔드 API 호출:', `/cart/list/${tripPlanId}?type=${type}`);
           const response = await fetch(
-            `${apiConfig.baseUrl}/cart/list/${tripPlanId}?type=${type}`,
+            `${apiConfig.baseUrl}/cart/list/${tripPlanId}?type=${encodeURIComponent(type)}`,
             {
               method: 'GET',
               credentials: apiConfig.credentials,

@@ -47,7 +47,7 @@ export default function FindPassword() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8081/api/users/${userId}/password`, {
+      const response = await fetch(`${apiConfig.baseUrl}/api/users/${userId}/password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
